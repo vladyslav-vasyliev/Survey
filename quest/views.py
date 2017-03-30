@@ -2,11 +2,16 @@ from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 
+from authentication.forms import MessageForm
 from quest.models import Survey, Response, AnswerText, AnswerRadio, AnswerSelect, AnswerSelectMultiple, AnswerInteger
 
 
 def surveys(request):
-    surveys = Survey.objects.all()  # TODO
+    try:
+        surveys = Survey.objects.all()
+    except Exception as e:
+        form = MessageForm(e, '/')
+        return render(request, 'msg.html', {'form': form})
     context = {'title': 'Surveys', 'surveys': surveys}
     return render(request, 'surveys.html', context)
 
@@ -14,19 +19,30 @@ def surveys(request):
 def survey(request, survey_id):
     if len(request.POST) > 0:
         return submit(request, survey_id)
-    survey = Survey.objects.get(pk=survey_id)  # TODO
+    try:
+        survey = Survey.objects.get(pk=survey_id)
+    except Exception as e:
+        form = MessageForm(e, '/')
+        return render(request, 'msg.html', {'form': form})
     context = {'title': 'Survey', 'survey': survey}
     return render(request, 'survey.html', context)
 
 
 def submit(request, survey_id):
-    survey = Survey.objects.get(pk=survey_id)  # TODO
+    try:
+        survey = Survey.objects.get(pk=survey_id)
+    except Exception as e:
+        form = MessageForm(e, '/')
+        return render(request, 'msg.html', {'form': form})
     items = list(request.POST.items())
 
     response = Response()
     response.survey = survey
-    response.save()
-    # Response.objects.create(response)  # TODO
+    try:
+        response.save()
+    except Exception as e:
+        form = MessageForm(e, '/')
+        return render(request, 'msg.html', {'form': form})
     for question in survey.question_set.all():
         answers = [item for item in items if ('q' + question.type + str(question.id)) in item[0]]
         for answer in answers:
@@ -45,14 +61,22 @@ def submit(request, survey_id):
                 res.question = question
                 res.response = response
                 res.body = answer[1]
-                res.save()
+                try:
+                    res.save()
+                except Exception as e:
+                    form = MessageForm(e, '/')
+                    return render(request, 'msg.html', {'form': form})
     return render(None, 'thanks.html', {})
 
 
 def statistics(request, survey_id):
     if not request.user.is_authenticated():
         return HttpResponseRedirect('/')
-    survey = Survey.objects.get(pk=survey_id)  # TODO
+    try:
+        survey = Survey.objects.get(pk=survey_id)
+    except Exception as e:
+        form = MessageForm(e, '/')
+        return render(request, 'msg.html', {'form': form})
     context = {'title': 'Survey', 'survey': survey}
     return render(request, 'statistics.html', context)
 
@@ -60,6 +84,10 @@ def statistics(request, survey_id):
 def raw_statistics(request, survey_id):
     if not request.user.is_authenticated():
         return HttpResponseRedirect('/')
-    survey = Survey.objects.get(pk=survey_id)  # TODO
+    try:
+        survey = Survey.objects.get(pk=survey_id)
+    except Exception as e:
+        form = MessageForm(e, '/')
+        return render(request, 'msg.html', {'form': form})
     context = {'title': 'Survey', 'survey': survey}
     return render(request, 'raw_statistics.html', context)
