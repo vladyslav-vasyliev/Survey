@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% block scripts %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.bundle.min.js"></script>
+{% endblock %}
+{% block body %}
+    <h2>Summary: {{ survey.name }}</h2>
+    {% for question in survey.question_set.all %}
+        {% if question.type != 'TQ' %}
+            <div class="row">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <h3 class="text-center">{{ question.text }}</h3>
+                        {% if question.type == 'RQ' or question.type == 'CQ' or question.type == 'LQ' %}
+                            <div>
+                                <canvas id="q{{ question.id }}" width="700" height="300"></canvas>
+                            </div>
+                        {% elif question.type == 'NQ' %}
+                            <p>Average: {{ question.get_stat.avg }}</p>
+                            <p>Number of answers: {{ question.get_stat.count }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    {% endfor %}
+    <script>
+        function createChart(context, type, stats) {
+            var keys = [];
+            var red, green, blue;
+            var colors = [];
+            var data = [];
+            for (var key in stats) {
+                if (stats.hasOwnProperty(key)) {
+                    keys.push(key);
+                    data.push(stats[key]);
+                    red = Math.floor((Math.random() * 255) + 1);
+                    green = Math.floor((Math.random() * 255) + 1);
+                    blue = Math.floor((Math.random() * 255) + 1);
+                    colors.push('rgba(' + red + ', ' + green + ', ' + blue + ', 0.5)');
+                }
+            }
+            var options = null;
+            if (type == 'bar') {
+                options = {
+                    legend: {
+                        display: false,
+                    },
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }]
+                    }
+                }
+            }
+            return new Chart(context, {
+                type: type,
+                data: {
+                    labels: keys,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: colors,
+                        borderColor: colors,
+                        borderWidth: 1
+                    }]
+                },
+                options: options
+            });
+        }
+        var ctx;
+        {% for question in survey.question_set.all %}
+            {% if question.type == 'TQ' %}
+            {% elif question.type == 'RQ' %}
+                ctx = document.getElementById("q{{ question.id }}");
+                {% autoescape off %}createChart(ctx, 'pie', {{ question.get_stat }});
+                {% endautoescape %}
+            {% elif question.type == 'CQ' or question.type == 'LQ' %}
+                ctx = document.getElementById("q{{ question.id }}");
+                {% autoescape off %}createChart(ctx, 'bar', {{ question.get_stat }});
+                {% endautoescape %}
+            {% elif question.type == 'NQ' %}
+            {% endif %}
+        {% endfor %}
+    </script>
+{% endblock %}

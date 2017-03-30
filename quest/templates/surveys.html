@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block body %}
+    <div class="row">
+        {% if user.is_authenticated %}
+            <h1>Statistics</h1>
+        {% else %}
+            <h1>Choose Survey</h1>
+        {% endif %}
+        <div class="col-md-12">
+            <ul class="list-group">
+                {% for survey in surveys %}
+                    {% if user.is_authenticated %}
+                        <div class="row list-group-item">
+                            <div class="col-md-6"><a href="survey/{{ survey.id }}">{{ survey.name }}</a>
+                            </div>
+                            <div class="col-md-3"><a
+                                    href="survey/{{ survey.id }}/statistics">Summary</a></div>
+                            <div class="col-md-3"><a
+                                    href="survey/{{ survey.id }}/statistics/raw">Raw Data</a></div>
+                        </div>
+                    {% else %}
+                        <div class="row list-group-item">
+                            <div class="col-md-6"><a href="survey/{{ survey.id }}">{{ survey.name }}</a></div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+{% endblock %}

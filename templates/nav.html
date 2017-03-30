@@ -1,0 +1,10 @@
+<ul class="nav navbar-nav navbar-right">
+    <li><a href="{% url 'quest:surveys' %}">Surveys</a></li>
+    {% if user.is_authenticated %}
+        <li><a href="/admin">Admin Panel</a></li>
+        <li><a href="{% url 'authentication:logout' %}">Logout</a></li>
+    {% else %}
+        <li><a href="{% url 'authentication:login' %}">Login</a></li>
+        <li><a href="{% url 'authentication:signup' %}">Sign up</a></li>
+    {% endif %}
+</ul>

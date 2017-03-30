@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block body %}
+    <h2>Raw: {{ survey.name }}</h2>
+    {% for response in survey.response_set.all %}
+        <div class="row">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <h4 class="text-center">Date: {{ response.created }}</h4>
+                    {% for answer in response.answerbase_set.all %}
+                        <div class="row">
+                            <p class="col-md-6">{{ forloop.counter }}. <strong>{{ answer.question.text }}</strong></p>
+                            <p class="col-md-6">
+                                {% if answer.question.type == 'TQ' %}
+                                    {{ answer.answertext.body }}
+                                {% elif answer.question.type == 'RQ' %}
+                                    {{ answer.answerradio.body }}
+                                {% elif answer.question.type == 'CQ' %}
+                                    {{ answer.answerselectmultiple.body }}
+                                {% elif answer.question.type == 'LQ' %}
+                                    {{ answer.answerselect.body }}
+                                {% elif answer.question.type == 'NQ' %}
+                                    {{ answer.answerinteger.body }}
+                                {% endif %}
+                            </p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% endblock %}

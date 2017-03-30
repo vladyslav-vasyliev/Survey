@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block body %}
+    <h2>{{ survey.name }}</h2>
+    <form class="container" method="post">
+        {% csrf_token %}
+        {% for question in survey.question_set.all %}
+            <div class="row">
+                <h3>{{ question.text }}</h3>
+                {% if question.type == 'TQ' %}
+                    <textarea class="form-control" type="text" name="qTQ{{ question.id }}" spellcheck="true"
+                              {% if question.required %}required{% endif %} rows="3"></textarea>
+                {% elif question.type == 'RQ' %}
+                    {% for choice in question.get_choices %}
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="qRQ{{ question.id }}"
+                                       value="{{ choice }}" {% if question.required %}required{% endif %}>{{ choice }}
+                            </label>
+                        </div>
+                    {% endfor %}
+                {% elif question.type == 'CQ' %}
+                    {% for choice in question.get_choices %}
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="qCQ{{ question.id }}c{{ forloop.counter0 }}"
+                                       value="{{ choice }}">{{ choice }}
+                            </label>
+                        </div>
+                    {% endfor %}
+                {% elif question.type == 'LQ' %}
+                    <select class="form-control" name="qLQ{{ question.id }}"
+                            {% if question.required %}required{% endif %}>
+                        {% for choice in question.get_choices %}
+                            <option value="{{ choice }}">{{ choice }}</option>
+                        {% endfor %}
+                    </select>
+                {% elif question.type == 'NQ' %}
+                    <input type="number" name="qNQ{{ question.id }}" min="{{ question.get_choices.0 }}"
+                           max="{{ question.get_choices.1 }}" {% if question.required %}required{% endif %}>
+                    ({{ question.get_choices.0 }}-{{ question.get_choices.1 }})
+                {% endif %}
+            </div>
+        {% endfor %}
+        <br/>
+        <button type="submit" class="btn btn-default">Submit</button>
+    </form>
+{% endblock %}
