@@ -75,7 +75,8 @@ class Question(models.Model):
                 count += 1
             if count > 0:
                 res = avg / count
-            res = 0
+            else:
+                res = 0
             return {'avg': str(round(res, 2)), 'count': count}
         return {}
 
