@@ -9,7 +9,6 @@ https://docs.djangoproject.com/en/1.10/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.10/ref/settings/
 """
-
 import os
 import django
 
@@ -24,11 +23,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = django.utils.crypto.get_random_string()
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = True
-DEBUG = bool(os.environ.get('DJANGO_DEBUG', True))
-
-ALLOWED_HOSTS = []
-
+DEBUG = True
+ALLOWED_HOSTS = ['35.187.66.66', '127.0.0.1']
 # Application definition
 
 INSTALLED_APPS = [
@@ -124,7 +120,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static"),
-    '/static/',
-]
+STATIC_ROOT = '/var/www/survey/static'
+
+# STATICFILES_DIRS = [
+#    os.path.join(BASE_DIR, "static"),
+#    '/static/',
+# ]

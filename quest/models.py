@@ -73,7 +73,10 @@ class Question(models.Model):
             for resp in self.answerbase_set.all():
                 avg += resp.answerinteger.body
                 count += 1
-            return {'avg': str(round(avg / count, 2)), 'count': count}
+            if count > 0:
+                res = avg / count
+            res = 0
+            return {'avg': str(round(res, 2)), 'count': count}
         return {}
 
     def __str__(self):
